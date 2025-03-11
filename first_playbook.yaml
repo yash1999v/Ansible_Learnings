@@ -1,0 +1,9 @@
+- hosts: localhost
+  become: true
+  become_method: sudo
+  connection: local
+
+  tasks:
+    - name: print the value of my string
+      ansible.builtin.debug:
+        msg: The value if my string is {{ my_string }}

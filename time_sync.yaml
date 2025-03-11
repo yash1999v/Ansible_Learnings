@@ -1,0 +1,12 @@
+#yaml file for syncing time from 0.redhat.pool.ntp.org
+---
+- name: Syncing time
+  hosts: all
+  become: yes
+  
+  vars:
+    timesync_ntp_servers:
+      - hostname: 0.redhat.pool.ntp.org
+
+  roles:
+    - rhel-system-roles.timesync

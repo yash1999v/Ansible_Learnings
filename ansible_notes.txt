@@ -98,7 +98,38 @@ ontario02.example.com
 canada
 
 usa
-
+==================
+=========
+yaml playbooks : have many plays in one playbook with modules
+ play1:
+	tasks:
+		task1:
+		task2: ---> modules for appservers
+ play2:
+	tasks:
+		task1:
+		task2: ---> modules for webservers
+EXAMPLE: 
+---
+- name: Configure important user consistently
+  hosts: servera.lab.example.com
+  tasks:
+    - name: Newbie exists with UID 4000
+      ansible.builtin.user:
+        name: newbie
+        uid: 4000
+        state: present
+...
+=========
+YAML - YAML ain't a  markup language(human readable serializable language)
+it supports key value pairs name : install httpd(no qutes required)
+indentation is important
+-dictionary:
+  -name:yash
+   email:yash@gmail.com
+cmd --syntax-check //for checking playbook syntax
+Imp: host key is play level not task level //better to use a editor
+===========
 
 
 
