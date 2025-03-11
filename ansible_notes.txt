@@ -130,6 +130,61 @@ indentation is important
 cmd --syntax-check //for checking playbook syntax
 Imp: host key is play level not task level //better to use a editor
 ===========
+Modue 4: Variables 
+  -must begin with alphabet
+  -there are 22 diff ways to use or keep variables(keep it simple)
+  methods:
+    - first_way: /role/defaults/
+      second_way: /inventory/roup-_vars/<varsFile.yaml>
+
+Variable Precedence 
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+
+create vars at play level , group_vars folder,task level ,set_facts
+vars_file:
+  - myvars.yaml //variablees should be in the same playbook folder
+
+
+print_plabook.yaml
+---
+- name: Printing my name
+  hosts: localhost
+  connection: local
+
+  vars_files:
+    - my_vars.yaml
+
+  tasks:
+    - name: Printing name task
+      ansible.builtin.debug:
+        msg: "Hi {{ my_string }} "
+
+example for set_fascts :higher precedence overides all 
+- name: ensure fact_controller learns about my vars
+  ansible.builtin.set_fact:
+    my_string: white //overides and sets my_string
+example of win precedence - wins always:
+// -e "user-my_user"
+
+cmd ansible-plabook first.yaml -e my_string=Yashwanth -i inventory.ini
+
+
+project
+├── ansible.cfg
+├── group_vars
+│   ├── datacenters
+│   ├── datacenters1
+│   └── datacenters2
+├── host_vars
+│   ├── demo1.example.com
+│   ├── demo2.example.com
+│   ├── demo3.example.com
+│   └── demo4.example.com
+├── inventory
+└── playbook.yml
+
+
+
 
 
 
