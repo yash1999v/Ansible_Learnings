@@ -1,0 +1,106 @@
+agentless - no master slave mode , just controller and managed nodes
+setup networks , db , set configuration
+automate security with vault
+
+Automating Linux Administration with Ansible
+1.agentless
+2.cross platform support(ssh & winrm)
+3.human readable:yaml, plaintxt
+4.easy to put in VCS
+5.dynamic inventory: update inventory from outside or inside
+6.Orchestration and Integration is easy 
+7.From dev to prod all
+
+Ansible i python developed and dependent rich plugins with module plugins,inventory plugins
+connection plugins(ssh connection plugin)
+become plugins ( work as user)
+cache,lookup,vars,callback (more plugins)
+
+
+Ansible engine -> ansible core 
+ansible tower -> ansible automation platform (deprecated at RH older version)
+
+ansible can be run by DNF in RHEL
+cmd--sudo dnf install -y ansible 
+weekest 
+1. /etc.ansible.cfg -- you need to be root
+2.~/.ansible.cfg -- override as per user 
+//project directory
+3../ansible.cfg
+//strongest 
+4.ANSIBLE_CONFIG= (SETTING UP VARIBALE)
+
+Date: 03/11/2025
+=====================
+cfg file is used to apply settings for multiple ansible tools 
+-It manages defaults and previlaged_escalations
+//To generate default directives and configs 
+ansible-config init --disabled > default_ansible.cfg
+//to Dump or see them 
+ansible-config dump 
+example:
+[defaults]
+
+inventory = ./inventory #list of hosts
+
+remote_user = user #user on managed nodes
+
+ask_pass = false # no prompt for password
+
+[privilege_escalation]
+
+become = true #auto switch user
+
+become_method = sudo 
+
+become_user = root
+
+become_ask_pass = false # ask password for become param
+
+ex : 2 
+inventory = ./myInventory/
+remote_user:devops
+collection_pathc=./collections/
+=====================
+Inventory : Manage hosts from diff sourses(satelite dir from RHEl. ms active directory ,etc.)
+-ansible controlller can dynamically use by using plugins 
+
+vi /.myinventory/inventory.ini
+[webservers]
+servera
+/erverb/
+[dbservers]
+serverc 
+serverd
+[rhel9]
+server[a:d]
+[rhel:children]
+rhel8
+rhel9
+
+cmd - ansible-inventory -i <.ini file> --graph // to show the structure 
+cmd - ansible-inventory -i invetory.ini --list // in list
+Nested Groups: // here usa & canada are children for north-america, so suffixed with :childeren
+[usa]
+
+washington1.example.com
+
+washington2.example.com
+
+[canada]
+
+ontario01.example.com
+
+ontario02.example.com
+
+[north-america:children]
+
+canada
+
+usa
+
+
+
+
+
+
