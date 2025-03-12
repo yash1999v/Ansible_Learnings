@@ -182,6 +182,34 @@ project
 │   └── demo4.example.com
 ├── inventory
 └── playbook.yml
+==============
+**Module 5**
+*RHEL System Roles*:linux-system-roles.vpn
+				    .firewall
+				    .timesync
+				    .sshd
+				    .certificate
+				    .storage etc.
+-usr/shares/ansible-roles //default location 
+ -System roles provide automation for many common system configuration tasks, including time synchronization, networking, firewall, tuning, and logging.
+ -https://access.redhat.com/articles/3050101
+ -use install -p by ansible galaxy
+===========
+*Automating with Modules*: rich module collections with plugins
+- A collection is combination of plugins,modules and roles.
+- Ansible Galaxy used to import and export the collections
+- Core-Set of collection // ex: ansible-galaxy collection install ansible.posix 
+	-ansible.builtin.dnf:
+	-ansible.posix.firewalld:
+	-ansible.builtin.copy:
+	--ansible.builtin.debug:
+cmd ansible-galaxy collection list // gives installed collections
+cmd ansible-doc -l //modules installed and its discriptions
+cmd ansible-doc copy //details of module	
+
+
+
+
 
 
 
