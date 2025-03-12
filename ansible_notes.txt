@@ -1,151 +1,133 @@
-agentless - no master slave mode , just controller and managed nodes
-setup networks , db , set configuration
-automate security with vault
+# Ansible Notes
 
-Automating Linux Administration with Ansible
-1.agentless
-2.cross platform support(ssh & winrm)
-3.human readable:yaml, plaintxt
-4.easy to put in VCS
-5.dynamic inventory: update inventory from outside or inside
-6.Orchestration and Integration is easy 
-7.From dev to prod all
+## Overview
+- **Agentless**: No master-slave mode, just a controller and managed nodes.
+- **Capabilities**:
+  - Setup networks, databases, and configurations.
+  - Automate security with Vault.
 
-Ansible i python developed and dependent rich plugins with module plugins,inventory plugins
-connection plugins(ssh connection plugin)
-become plugins ( work as user)
-cache,lookup,vars,callback (more plugins)
+## Automating Linux Administration with Ansible
+1. **Agentless**
+2. **Cross-platform support** (SSH & WinRM)
+3. **Human-readable** (YAML, plain text)
+4. **Easy to version control**
+5. **Dynamic inventory** (update inventory from inside or outside)
+6. **Orchestration and integration** are easy
+7. **From development to production**
 
+## Ansible Architecture
+- **Developed in Python** with rich plugin support:
+  - **Module plugins**
+  - **Inventory plugins**
+  - **Connection plugins** (e.g., SSH connection plugin)
+  - **Become plugins** (e.g., work as different users)
+  - **Cache, lookup, vars, callback plugins**
 
-Ansible engine -> ansible core 
-ansible tower -> ansible automation platform (deprecated at RH older version)
+## Ansible Components
+- **Ansible Engine** → Ansible Core
+- **Ansible Tower** → Deprecated, now **Ansible Automation Platform**
+- **Installation on RHEL**:
+  ```bash
+  sudo dnf install -y ansible
+  ```
 
-ansible can be run by DNF in RHEL
-cmd--sudo dnf install -y ansible 
-weekest 
-1. /etc.ansible.cfg -- you need to be root
-2.~/.ansible.cfg -- override as per user 
-//project directory
-3../ansible.cfg
-//strongest 
-4.ANSIBLE_CONFIG= (SETTING UP VARIBALE)
+## Configuration File (`ansible.cfg`)
+Configuration files are applied in order of precedence:
+1. `/etc/ansible.cfg` (system-wide, weakest)
+2. `~/.ansible.cfg` (user-specific, overrides system-wide)
+3. `./ansible.cfg` (project directory, stronger)
+4. `ANSIBLE_CONFIG` environment variable (strongest)
 
-Date: 03/11/2025
-=====================
-cfg file is used to apply settings for multiple ansible tools 
--It manages defaults and previlaged_escalations
-//To generate default directives and configs 
+### Generate default configuration:
+```bash
 ansible-config init --disabled > default_ansible.cfg
-//to Dump or see them 
-ansible-config dump 
-example:
-[defaults]
+```
+### View current configuration:
+```bash
+ansible-config dump
+```
 
-inventory = ./inventory #list of hosts
+## Inventory Management
+- Manage hosts from different sources (Satellite, Active Directory, etc.).
+- Dynamic inventory using plugins.
+- Example Inventory (`inventory.ini`):
+  ```ini
+  [webservers]
+  servera
+  serverb
+  
+  [dbservers]
+  serverc
+  serverd
+  
+  [rhel9]
+  server[a:d]
+  
+  [rhel:children]
+  rhel8
+  rhel9
+  ```
+- Commands:
+  ```bash
+  ansible-inventory -i inventory.ini --graph   # Show inventory structure
+  ansible-inventory -i inventory.ini --list    # Show inventory in list format
+  ```
+- Nested Groups Example:
+  ```ini
+  [usa]
+  washington1.example.com
+  washington2.example.com
 
-remote_user = user #user on managed nodes
+  [canada]
+  ontario01.example.com
+  ontario02.example.com
 
-ask_pass = false # no prompt for password
+  [north-america:children]
+  canada
+  usa
+  ```
 
-[privilege_escalation]
-
-become = true #auto switch user
-
-become_method = sudo 
-
-become_user = root
-
-become_ask_pass = false # ask password for become param
-
-ex : 2 
-inventory = ./myInventory/
-remote_user:devops
-collection_pathc=./collections/
-=====================
-Inventory : Manage hosts from diff sourses(satelite dir from RHEl. ms active directory ,etc.)
--ansible controlller can dynamically use by using plugins 
-
-vi /.myinventory/inventory.ini
-[webservers]
-servera
-/erverb/
-[dbservers]
-serverc 
-serverd
-[rhel9]
-server[a:d]
-[rhel:children]
-rhel8
-rhel9
-
-cmd - ansible-inventory -i <.ini file> --graph // to show the structure 
-cmd - ansible-inventory -i invetory.ini --list // in list
-Nested Groups: // here usa & canada are children for north-america, so suffixed with :childeren
-[usa]
-
-washington1.example.com
-
-washington2.example.com
-
-[canada]
-
-ontario01.example.com
-
-ontario02.example.com
-
-[north-america:children]
-
-canada
-
-usa
-==================
-=========
-yaml playbooks : have many plays in one playbook with modules
- play1:
-	tasks:
-		task1:
-		task2: ---> modules for appservers
- play2:
-	tasks:
-		task1:
-		task2: ---> modules for webservers
-EXAMPLE: 
+## YAML Playbooks
+Playbooks contain multiple plays:
+```yaml
 ---
 - name: Configure important user consistently
   hosts: servera.lab.example.com
   tasks:
-    - name: Newbie exists with UID 4000
+    - name: Ensure newbie user exists with UID 4000
       ansible.builtin.user:
         name: newbie
         uid: 4000
         state: present
-...
-=========
-YAML - YAML ain't a  markup language(human readable serializable language)
-it supports key value pairs name : install httpd(no qutes required)
-indentation is important
--dictionary:
-  -name:yash
-   email:yash@gmail.com
-cmd --syntax-check //for checking playbook syntax
-Imp: host key is play level not task level //better to use a editor
-===========
-Modue 4: Variables 
-  -must begin with alphabet
-  -there are 22 diff ways to use or keep variables(keep it simple)
-  methods:
-    - first_way: /role/defaults/
-      second_way: /inventory/roup-_vars/<varsFile.yaml>
+```
 
-Variable Precedence 
-https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+## YAML Basics
+- YAML Ain't Markup Language (Human-readable, serializable)
+- Supports **key-value pairs**:
+  ```yaml
+  name: install httpd  # No quotes required
+  ```
+- **Indentation is important**
+- Dictionary Example:
+  ```yaml
+  - name: Yashwanth
+    email: yash@gmail.com
+  ```
+- **Syntax check for playbooks**:
+  ```bash
+  ansible-playbook --syntax-check playbook.yml
+  ```
 
-create vars at play level , group_vars folder,task level ,set_facts
-vars_file:
-  - myvars.yaml //variablees should be in the same playbook folder
+## Variables in Ansible
+- Must start with an alphabet.
+- **22 different ways to define variables** (Keep it simple).
+- Example variable definition methods:
+  - `roles/defaults/`
+  - `inventory/group_vars/varsFile.yaml`
+- Variable Precedence: [Docs](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)
 
-
-print_plabook.yaml
+### Example Playbook Using Variables:
+```yaml
 ---
 - name: Printing my name
   hosts: localhost
@@ -155,66 +137,67 @@ print_plabook.yaml
     - my_vars.yaml
 
   tasks:
-    - name: Printing name task
+    - name: Print name task
       ansible.builtin.debug:
-        msg: "Hi {{ my_string }} "
+        msg: "Hi {{ my_string }}"
+```
 
-example for set_fascts :higher precedence overides all 
-- name: ensure fact_controller learns about my vars
+### Example Using `set_fact` (Higher precedence):
+```yaml
+- name: Ensure fact controller learns about my vars
   ansible.builtin.set_fact:
-    my_string: white //overides and sets my_string
-example of win precedence - wins always:
-// -e "user-my_user"
+    my_string: white  # Overrides any previous value
+```
 
-cmd ansible-plabook first.yaml -e my_string=Yashwanth -i inventory.ini
+### Example Passing Variables from CLI:
+```bash
+ansible-playbook first.yaml -e my_string=Yashwanth -i inventory.ini
+```
 
-
-project
+## Recommended Project Structure
+```bash
+project/
 ├── ansible.cfg
-├── group_vars
+├── group_vars/
 │   ├── datacenters
 │   ├── datacenters1
-│   └── datacenters2
-├── host_vars
+│   ├── datacenters2
+├── host_vars/
 │   ├── demo1.example.com
 │   ├── demo2.example.com
 │   ├── demo3.example.com
-│   └── demo4.example.com
+│   ├── demo4.example.com
 ├── inventory
 └── playbook.yml
-==============
-**Module 5**
-*RHEL System Roles*:linux-system-roles.vpn
-				    .firewall
-				    .timesync
-				    .sshd
-				    .certificate
-				    .storage etc.
--usr/shares/ansible-roles //default location 
- -System roles provide automation for many common system configuration tasks, including time synchronization, networking, firewall, tuning, and logging.
- -https://access.redhat.com/articles/3050101
- -use install -p by ansible galaxy
-===========
-*Automating with Modules*: rich module collections with plugins
-- A collection is combination of plugins,modules and roles.
-- Ansible Galaxy used to import and export the collections
-- Core-Set of collection // ex: ansible-galaxy collection install ansible.posix 
-	-ansible.builtin.dnf:
-	-ansible.posix.firewalld:
-	-ansible.builtin.copy:
-	--ansible.builtin.debug:
-cmd ansible-galaxy collection list // gives installed collections
-cmd ansible-doc -l //modules installed and its discriptions
-cmd ansible-doc copy //details of module	
+```
 
+## RHEL System Roles
+System roles provide automation for system configuration:
+- **Common roles**:
+  - `linux-system-roles.vpn`
+  - `linux-system-roles.firewall`
+  - `linux-system-roles.timesync`
+  - `linux-system-roles.sshd`
+  - `linux-system-roles.certificate`
+  - `linux-system-roles.storage`
+- Default location: `/usr/share/ansible-roles`
+- More details: [RHEL System Roles](https://access.redhat.com/articles/3050101)
 
-
-
-
-
-
-
-
-
-
+## Ansible Modules & Plugins
+- **Modules**: Rich module collection with plugins
+- **Collections**: Combination of plugins, modules, and roles.
+- **Ansible Galaxy**: Import/export collections.
+- **Core modules**:
+  ```yaml
+  - ansible.builtin.dnf:
+  - ansible.posix.firewalld:
+  - ansible.builtin.copy:
+  - ansible.builtin.debug:
+  ```
+- Commands:
+  ```bash
+  ansible-galaxy collection list  # Show installed collections
+  ansible-doc -l                  # List available modules
+  ansible-doc copy                 # Show details of copy module
+  ```
 
