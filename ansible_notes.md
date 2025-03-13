@@ -204,3 +204,67 @@ System roles provide automation for system configuration:
 -https://console.redhat.com/ansible/automation-hub/
   to browse these collections.
 - https://galaxy.ansible.com/
+
+===========
+# Module 6: Handlers in Ansible
+
+## What are Handlers?  
+Ansible handlers are special tasks that are **executed only when notified** by another task. They help maintain **idempotency** by ensuring that certain actions (like restarting a service) run only when necessary.
+
+
+
+## 📌 Example 1: Kernel Update with Handlers  
+```yaml
+- name: Kernel Update
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Ensure kernel is updated
+      ansible.builtin.dnf:
+        name: kernel
+        state: latest
+      notify: Ensure system is rebooted
+
+  handlers:
+    - name: Ensure system is rebooted
+      ansible.builtin.reboot:
+        msg: "Rebooting due to kernel update"
+
+ex 2:
+tasks:
+  - name: copy demo.example.conf configuration template
+    ansible.builtin.template:
+      src: /var/lib/templates/demo.example.conf.template
+      dest: /etc/httpd/conf.d/demo.example.conf
+    notify:
+      - restart mysql
+      - restart apache
+
+handlers:
+  - name: restart mysql
+    ansible.builtin.service:
+      name: mariadb
+      state: restarted
+
+  - name: restart apache
+    ansible.builtin.service:
+      name: httpd
+      state: restarted
+
+## key points
+---
+- As discussed in the Ansible documentation, there are some important things to remember about using handlers:
+
+- Handlers always run in the order specified by the handlers section of the play. They do not run in the order in which they are listed by notify statements in a task, or in the order in which tasks notify them.
+
+- Handlers normally run after all other tasks in the play complete. A handler called by a task in the tasks part of the playbook does not run until all tasks under tasks have been processed. (Some minor exceptions to this exist.)
+
+- Handler names exist in a per-play namespace. If two handlers are incorrectly given the same name, only one of them runs.
+
+- Even if more than one task notifies a handler, the handler runs one time. If no tasks notify it, the handler does not run.
+
+- If a task that includes a notify statement does not report a changed result (for example, a package is already installed and the task reports ok), the handler is not notified. Ansible notifies handlers only if the task reports the changed status.
+---
+
+
