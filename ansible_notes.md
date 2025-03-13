@@ -251,9 +251,9 @@ handlers:
     ansible.builtin.service:
       name: httpd
       state: restarted
-
-## key points
 ---
+## key points
+
 - As discussed in the Ansible documentation, there are some important things to remember about using handlers:
 
 - Handlers always run in the order specified by the handlers section of the play. They do not run in the order in which they are listed by notify statements in a task, or in the order in which tasks notify them.
