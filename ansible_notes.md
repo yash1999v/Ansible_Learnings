@@ -251,7 +251,9 @@ handlers:
     ansible.builtin.service:
       name: httpd
       state: restarted
----
+...
+```
+- done
 ## key points
 
 - As discussed in the Ansible documentation, there are some important things to remember about using handlers:
