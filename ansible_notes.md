@@ -272,7 +272,7 @@ handlers:
 if few tasks share same property "block" is used 
  under block they can be written 
 
-ex :
+```yaml
 - name: Conditional demo
   hosts: server_a
   gather_facts: true
@@ -296,7 +296,7 @@ ex :
             name: httpd
             state: started
             enabled: true
-example for suse:
+//example for suse:
 - name: Conditional demo for SUSE
   hosts: server_a
   gather_facts: true
@@ -321,6 +321,7 @@ example for suse:
             state: started
             enabled: true
 ```
+```yaml
 ansible.builtin.assert:   //This will help to assert without stopping 
   that:
     -my package is defined
@@ -329,7 +330,9 @@ ansible.builtin.assert:   //This will help to assert without stopping
 	done
   fail_msg:
 	failed at finding pck
+```
 ## one more concept - rescue and always comes when block fails 
+```yaml
 tasks:
 
   name:
@@ -343,8 +346,9 @@ tasks:
   rescue:
 
   alwsys:
-
+```
 ** The supported_distros variable was created by the playbook author, and contains a list of operating system distributions that the playbook supports. If the value of ansible_facts['distribution'] is in the supported_distros list, the conditional passes and the task runs.**
+```yaml
 ---
 - name: Demonstrate the "in" keyword
   hosts: all
@@ -360,7 +364,7 @@ tasks:
         state: present
       when: ansible_facts['distribution'] in supported_distros
 
-
+```
 
 
 
