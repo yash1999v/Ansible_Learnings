@@ -1,0 +1,32 @@
+---
+- name: Terminate EC2 instances
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  
+  vars_files:
+    - /home/durga/ansible_learnings/group_vars/all/aws_credentials.yml
+
+  tasks:
+    - name: Read instance details from file
+      slurp:
+        src: /home/durga/ansible_learnings/ec2_instance_details.txt
+      register: instance_details
+
+    - name: Parse instance IDs
+      set_fact:
+        instance_ids: "{{ instance_details.content | b64decode | regex_findall('Instance ID: (i-[a-zA-Z0-9]+)') }}"
+
+    - name: Terminate EC2 instances
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        region: ap-south-1
+        instance_ids: "{{ instance_ids }}"
+        state: absent
+      when: instance_ids | length > 0
+
+    - name: Print terminated instance IDs
+      debug:
+        msg: "Terminated Instance ID: {{ item }}"
+      loop: "{{ instance_ids }}"

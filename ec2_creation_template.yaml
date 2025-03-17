@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  connection: local
+  
+  vars_files:
+    - /home/durga/ansible_learnings/group_vars/all/aws_credentials.yml
+  tasks:
+  - name: Create an EC2 instance
+    amazon.aws.ec2_instance:
+      name: "{{ item.name }}"
+      image_id: "{{ item.image_id }}"
+      instance_type: t2.micro
+      key_name: "ansible_key"
+      security_group: default
+      region: ap-south-1
+      aws_access_key: "{{aws_access_key}}"
+      aws_secret_key: "{{aws_secret_key}}"
+      network:
+        assign_public_ip: true
+      tags:
+        Environment: "{{ item.name }}"
+    loop:
+      - { name: "ansible-instance", image_id: "ami-0e1d06225679bc1c5" }
+      - { name: "ansible-instance-2", image_id: "ami-0f58b397bc5c1f2e8" }
+      - { name: "ansible-instance-3", image_id: "ami-0f58b397bc5c1f2e8" }
