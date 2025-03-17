@@ -268,5 +268,103 @@ handlers:
 
 - If a task that includes a notify statement does not report a changed result (for example, a package is already installed and the task reports ok), the handler is not notified. Ansible notifies handlers only if the task reports the changed status.
 ---
+## Conditionals
+if few tasks share same property "block" is used 
+ under block they can be written 
+
+```yaml
+- name: Conditional demo
+  hosts: server_a
+  gather_facts: true
+  become: true
+  
+  tasks:
+    - name: Verify OS is RHEL-based
+      when: "'RedHat' in ansible_facts['distribution']"
+      block:
+        - name: Ensure message is displayed
+          ansible.builtin.debug:
+            msg: "We have matched RedHat to distribution"
+
+        - name: Ensure httpd is installed
+          ansible.builtin.dnf:
+            name: httpd
+            state: latest
+
+        - name: Starting the service
+          ansible.builtin.service:
+            name: httpd
+            state: started
+            enabled: true
+//example for suse:
+- name: Conditional demo for SUSE
+  hosts: server_a
+  gather_facts: true
+  become: true
+  
+  tasks:
+    - name: Verify OS is SUSE-based
+      when: "'SUSE' in ansible_facts['distribution']"
+      block:
+        - name: Ensure message is displayed
+          ansible.builtin.debug:
+            msg: "We have matched SUSE to distribution"
+
+        - name: Ensure Apache (httpd) is installed
+          ansible.builtin.zypper:
+            name: apache2
+            state: latest
+
+        - name: Start and enable Apache service
+          ansible.builtin.service:
+            name: apache2
+            state: started
+            enabled: true
+```
+```yaml
+ansible.builtin.assert:   //This will help to assert without stopping 
+  that:
+    -my package is defined
+    - (my_package == "httpd") or (my_package == nginx
+  success_msg:
+	done
+  fail_msg:
+	failed at finding pck
+```
+## one more concept - rescue and always comes when block fails 
+```yaml
+tasks:
+
+  name:
+  ansible.builtin....
+
+  name:
+  block:
+    -name: 
+
+
+  rescue:
+
+  alwsys:
+```
+** The supported_distros variable was created by the playbook author, and contains a list of operating system distributions that the playbook supports. If the value of ansible_facts['distribution'] is in the supported_distros list, the conditional passes and the task runs.**
+```yaml
+---
+- name: Demonstrate the "in" keyword
+  hosts: all
+  gather_facts: yes
+  vars:
+    supported_distros:
+      - RedHat
+      - Fedora
+  tasks:
+    - name: Install httpd using dnf, where supported
+      ansible.builtin.dnf:
+        name: http
+        state: present
+      when: ansible_facts['distribution'] in supported_distros
+
+```
+
 
 
