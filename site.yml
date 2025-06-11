@@ -1,0 +1,17 @@
+- name: Server Provisioning Playbook
+  hosts: devservers
+  become: true
+  gather_facts: true
+  vars:
+    timezone_region: Asia/Kolkata
+    ssh_key: "{{ lookup('file', 'id_rsa.pub') }}"
+    packages_to_install:
+      - nginx
+      - fail2ban
+      - ntp
+  roles:
+      -common
+      -firewall
+      -nginx
+      - user
+      -debugger
